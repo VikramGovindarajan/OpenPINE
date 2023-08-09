@@ -21,7 +21,6 @@ model Pipe
 	SI.Length heights_ab;
 	Real fricfact;
 	Real Ih(unit = "/m");
-	// Integer momentumDynamics = 4;
 	
 equation
 	
@@ -34,16 +33,16 @@ equation
     delp_gr = rho*Modelica.Constants.g_n*heights_ab;
 	Ih = length / crossArea;
 
-    // if momentumDynamics == 4 then
-		del_p + delp_fr = 0;
-    // else
-		// del_p + delp_fr = Ih * der(m_flow);
-    // end if;
+	del_p + delp_fr = -Ih * der(m_flow);
 
 	port_a.m_flow = - m_flow;
     0 = port_a.m_flow + port_b.m_flow;
 
 	port_a.h_outflow = 1;
     0 = port_a.h_outflow + port_b.h_outflow;
+
+initial equation
+	
+	der(m_flow) = 0;
 	
 end Pipe;
