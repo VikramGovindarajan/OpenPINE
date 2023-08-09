@@ -2,7 +2,7 @@ within Flow;
 
 model Pipe
 
-  extends Modelica.Fluid.Interfaces.PartialTwoPort;
+    extends Modelica.Fluid.Interfaces.PartialTwoPort;
 
 	import SI=Modelica.Units.SI;
 
@@ -10,22 +10,38 @@ model Pipe
       Modelica.Media.Interfaces.PartialMedium "Medium in the component";
 
 	parameter SI.Length length "Length";
-	parameter SI.Diameter diameter "Diameter of circular pipe";
-	
-	Real m_flow;
+
+	SI.Diameter diameter "Diameter of circular pipe";
+	SI.MassFlowRate m_flow;
 	SI.Pressure delp_fr;
-	SI.Pressure dp;
+	SI.Pressure delp_gr;
+	SI.Pressure del_p;
     SI.Area crossArea=Modelica.Constants.pi*diameter*diameter/4;
+	SI.Density rho;
+	SI.Length heights_ab;
+	Real fricfact;
+	Real Ih(unit = "/m");
+	// Integer momentumDynamics = 4;
 	
 equation
-	delp_fr = 0.05 * length * m_flow * abs(m_flow) / (2.*diameter * 1000 * crossArea * crossArea);
-	dp = port_a.p - port_b.p;
+	
+	fricfact = 0.05;
+	rho = 1000;
+	heights_ab = 0;
 
-	0 = dp + delp_fr ;
+	del_p = port_a.p - port_b.p;
+	delp_fr = fricfact * length * m_flow * abs(m_flow) / (2. * diameter * rho * crossArea * crossArea);
+    delp_gr = rho*Modelica.Constants.g_n*heights_ab;
+	Ih = length / crossArea;
+
+    // if momentumDynamics == 4 then
+		del_p + delp_fr = 0;
+    // else
+		// del_p + delp_fr = Ih * der(m_flow);
+    // end if;
 
 	port_a.m_flow = - m_flow;
     0 = port_a.m_flow + port_b.m_flow;
-	
 
 	port_a.h_outflow = 1;
     0 = port_a.h_outflow + port_b.h_outflow;
