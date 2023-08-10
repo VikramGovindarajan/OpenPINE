@@ -29,6 +29,6 @@ equation
 
   der(V * 1000) = ports[1].m_flow;
   
-  ports[1].h_outflow = 1;
+  ports[1].h_outflow = 125194;
 
 end Reservoir;

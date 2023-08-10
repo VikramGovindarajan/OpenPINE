@@ -2,7 +2,7 @@
 model Tutorial1		
 
    replaceable package Medium =
-      Modelica.Media.Water.ConstantPropertyLiquidWater                           constrainedby
+      Modelica.Media.Water.StandardWater                           constrainedby
     Modelica.Media.Interfaces.PartialMedium "Medium in the component";
 
 // node inputs
@@ -26,8 +26,8 @@ model Tutorial1
   inner Modelica.Fluid.System system(energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial);
 
 initial equation
-	reservoir1.level = 8;
-	reservoir2.level = 2;
+	reservoir1.level = 2;
+	reservoir2.level = 8;
 
 equation
   connect(reservoir1.ports[1],pipe1.port_a);

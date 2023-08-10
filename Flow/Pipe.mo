@@ -10,8 +10,8 @@ model Pipe
       Modelica.Media.Interfaces.PartialMedium "Medium in the component";
 
 	parameter SI.Length length "Length";
+	parameter SI.Diameter diameter "Diameter of circular pipe";
 
-	SI.Diameter diameter "Diameter of circular pipe";
 	SI.MassFlowRate m_flow;
 	SI.Pressure delp_fr;
 	SI.Pressure delp_gr;
@@ -43,8 +43,8 @@ equation
 	port_a.m_flow = - m_flow;
     0 = port_a.m_flow + port_b.m_flow;
 
-	port_a.h_outflow = 1;
-    0 = port_a.h_outflow + port_b.h_outflow;
+	port_a.h_outflow = port_b.h_outflow;
+    0 = actualStream(port_a.h_outflow) + actualStream(port_b.h_outflow);
 
 initial equation
 	
