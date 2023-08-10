@@ -17,23 +17,28 @@ model Pipe
 	SI.Pressure delp_gr;
 	SI.Pressure del_p;
     SI.Area crossArea=Modelica.Constants.pi*diameter*diameter/4;
-	SI.Density rho;
 	SI.Length heights_ab;
-	Real fricfact;
-	Real Ih(unit = "/m");
+	Real fricfact "Friction Factor";
+	Real Ih(unit = "/m") "Hydraulic Inertia";
+	parameter Integer n=2 "Number of discrete flow volumes";
+	input Medium.ThermodynamicState[n] states = 
+		{Medium.setState_phX(port_a.p, inStream(port_a.h_outflow), inStream(port_a.Xi_outflow)),
+		 Medium.setState_phX(port_b.p, inStream(port_b.h_outflow), inStream(port_b.Xi_outflow))};
+	Medium.Density[n] rhos = Medium.density(states);
+	Medium.Density[n-1] rhos_act "Actual density per segment";
 	
 equation
 	
 	fricfact = 0.05;
-	rho = 1000;
+    rhos_act = 0.5*(rhos[1:n-1] + rhos[2:n]);
 	heights_ab = 0;
 
 	del_p = port_a.p - port_b.p;
-	delp_fr = fricfact * length * m_flow * abs(m_flow) / (2. * diameter * rho * crossArea * crossArea);
-    delp_gr = rho*Modelica.Constants.g_n*heights_ab;
+	delp_fr = fricfact * length * m_flow * abs(m_flow) / (2. * diameter * rhos_act[1] * crossArea * crossArea);
+    delp_gr = rhos_act[1]*Modelica.Constants.g_n*heights_ab;
 	Ih = length / crossArea;
 
-	del_p + delp_fr = -Ih * der(m_flow);
+	Ih * der(m_flow) + del_p + delp_fr = 0;
 
 	port_a.m_flow = - m_flow;
     0 = port_a.m_flow + port_b.m_flow;
